@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Character;
 use App\Models\Element;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class GenshinImpactController extends Controller
 {
@@ -71,28 +72,34 @@ class GenshinImpactController extends Controller
         return view('characters.edit', compact('character', 'elements'));
     }
 
-    public function update(Request $request, Character $character)
-    {
-        $validated = $request->validate([
-            'name' => 'required|max:100',
-            'element_id' => 'required|exists:elements,id',
-            'weapon' => 'required|in:Sword,Claymore,Polearm,Catalyst,Bow',
-            'rarity' => 'required|numeric|in:4,5',
-            'is_playable' => 'required|boolean',
-            'remarks' => 'nullable',
-        ]);
+public function update(Request $request, Character $character)
+{
+    $validated = $request->validate([
+        'name' => 'required|max:100',
+        'element_id' => 'required|exists:elements,id',
+        'weapon' => 'required|in:Sword,Claymore,Polearm,Catalyst,Bow',
+        'rarity' => 'required|numeric|in:4,5',
+        'is_playable' => 'required|boolean',
+        'remarks' => 'nullable',
+    ]);
 
-        $character->update($validated);
+    $character->update($validated);
 
-        return redirect()->route('characters.index');
-    }
+    Log::info('Character updated', [
+        'id' => $character->id,
+    ]);
 
-    public function destroy(Character $character)
-    {
-        $character->delete();
+    return redirect()->route('characters.index');
+}
 
-        return redirect()->route('characters.index');
-    }
+public function destroy(Character $character)
+{
+    abort_if($character->element->characters()->count() === 1, 403);
+
+    $character->delete();
+
+    return redirect()->route('characters.index');
+}
 
     public function featured()
     {
