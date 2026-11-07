@@ -1,13 +1,13 @@
-## Lab Activity 11 Answers
+## Lab Activity 12 Answers
 
-### G1. What two things are needed for route model binding?
+### H1. Why was the vendor file not where the mistake was?
 
-The controller parameter must be type-hinted with the `Character` model, and the variable name must match the route segment name. For the `characters` resource, Laravel uses `{character}`, so the method must use `Character $character`. If either the type or name is wrong, Laravel will not inject the record correctly.
+The vendor file was where Laravel stopped while trying to run the invalid method call, not where I created the mistake. The exception trace showed the actual problem in my `GenshinImpactController.php` line containing `withh('element')`, so that was the file I needed to fix.
 
-### G2. Why did the Delete link open the detail page?
+### H2. What can the log line tell me next month that the error page could not?
 
-An HTML link sends a GET request only. The GET request for the same character address belongs to the show action, while deleting requires the DELETE verb. Therefore, the link opened the detail page instead of deleting anything.
+My `Log::info()` line records that a character was updated and includes the real character ID. Next month I can look in `storage/logs/laravel.log` and know which character was updated, even if nobody is currently looking at the browser or an error page.
 
-### G3. What would break if the second argument of old() were missing or used alone?
+### H3. When is 403 better, and when is redirecting with a message better?
 
-Without the second argument, a fresh edit form would be empty because there would be no current character value to use as a fallback. If I used only the record value and left out old(), the form would lose the values I typed after a rejected submission. Using both lets Laravel show old input first and the saved record value otherwise.
+A 403 is better when the request must be refused, such as trying to delete the only character in an element group. Redirecting back with a message is better when the request is reasonable but cannot be completed and the user should return to the previous page with an explanation.
