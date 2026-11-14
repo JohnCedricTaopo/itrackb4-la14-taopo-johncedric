@@ -1,13 +1,13 @@
-## Lab Activity 12 Answers
+## Lab Activity 13 Answers
 
-### H1. Why was the vendor file not where the mistake was?
+### J1. What does HomeController not have to do?
 
-The vendor file was where Laravel stopped while trying to run the invalid method call, not where I created the mistake. The exception trace showed the actual problem in my `GenshinImpactController.php` line containing `withh('element')`, so that was the file I needed to fix.
+My HomeController is not a resource controller, so its `index()` method does not have to receive a record ID or perform resource actions such as showing, creating, updating or deleting a Character. It only prepares the two live counts and returns the `home` view.
 
-### H2. What can the log line tell me next month that the error page could not?
+### J2. Why did the pagination links lose the search term?
 
-My `Log::info()` line records that a character was updated and includes the real character ID. Next month I can look in `storage/logs/laravel.log` and know which character was updated, even if nobody is currently looking at the browser or an error page.
+Before I added `withQueryString()`, the pagination links only contained the page number. Because the search value was not carried into the next URL, the controller received an empty search value and returned the full list again. `withQueryString()` keeps the search, filter and sort values in every pagination link.
 
-### H3. When is 403 better, and when is redirecting with a message better?
+### J3. Why is a misspelled sort value worse than an error, and what does the allowed list do?
 
-A 403 is better when the request must be refused, such as trying to delete the only character in an element group. Redirecting back with a message is better when the request is reasonable but cannot be completed and the user should return to the previous page with an explanation.
+A misspelled sort value is worse than an obvious error because the page still loads but the visitor cannot trust the order of the records. My allowed list accepts only `name` and `rarity`; anything else automatically falls back to `name` before the query runs.
