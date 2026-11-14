@@ -1,20 +1,44 @@
-@php
-    $charactersSectionActive = request()->is('characters*');
-@endphp
+<nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+    <div class="container-fluid px-4">
+        <a
+            class="navbar-brand fw-semibold"
+            href="{{ route('home') }}"
+        >
+            Genshin Impact Character Archive
+        </a>
 
-<nav class="nav nav-pills gap-2" aria-label="Main navigation">
-    <a class="nav-link {{ $charactersSectionActive ? 'active bg-primary text-white' : 'bg-primary text-white' }}"
-       href="{{ route('characters.index') }}">
-        All Characters
-    </a>
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mainNav"
+            aria-controls="mainNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <a class="nav-link {{ request()->is('characters/featured') ? 'active bg-secondary text-white' : 'bg-secondary text-white' }}"
-       href="{{ route('characters.featured') }}">
-        Featured Character
-    </a>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a
+                        class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}"
+                        href="{{ route('home') }}"
+                    >
+                        Home
+                    </a>
+                </li>
 
-    <a class="nav-link {{ request()->is('characters/filter*') ? 'active bg-success text-white' : 'bg-success text-white' }}"
-       href="{{ route('characters.filter') }}">
-        Old Filter Redirect
-    </a>
+                <li class="nav-item">
+                    <a
+                        class="nav-link {{ request()->routeIs('characters.*') ? 'active' : '' }}"
+                        href="{{ route('characters.index') }}"
+                    >
+                        Characters
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
 </nav>

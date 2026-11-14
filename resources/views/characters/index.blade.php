@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'All Characters')
+@section('title', 'Characters')
 
 @section('content')
     <div class="card shadow-sm">
@@ -10,116 +10,76 @@
                     <p class="text-uppercase text-primary fw-semibold small mb-1">
                         Genshin Impact collection
                     </p>
-
-                    <h2 class="mb-1">Character Archive</h2>
-
-                    <p class="text-muted mb-0">
-                        Select a character name to open its individual page.
-                    </p>
+                    <h1 class="h2 mb-1">Character Archive</h1>
+                    <p class="text-muted mb-0">Search, filter and sort the character records.</p>
                 </div>
 
-                <div class="d-flex gap-2">
-                    <a
-                        class="btn btn-success"
-                        href="{{ route('characters.create') }}"
-                    >
-                        Add character
-                    </a>
-
-                    <a
-                        class="btn btn-primary"
-                        href="{{ route('characters.featured') }}"
-                    >
-                        View featured
-                    </a>
-                </div>
+                <a class="btn btn-success" href="{{ route('characters.create') }}">
+                    Add character
+                </a>
             </div>
 
             @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
+                <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
-            <div class="alert alert-info">
-                <strong>Active filters:</strong>
-                Element:
-                {{ $element === 'all' ? 'All elements' : $element }}
-                |
-                Rarity:
-                {{ $rarity === 'all' ? 'All rarities' : $rarity . '-Star' }}
-            </div>
-
-            <div class="mb-4">
-                <h5>Filter by element</h5>
-
-                <div class="d-flex flex-wrap gap-2">
-                    <a
-                        class="btn btn-outline-secondary btn-sm"
-                        href="{{ route('characters.index', [
-                            'rarity' => $rarity !== 'all' ? $rarity : null
-                        ]) }}"
+            <form method="GET" action="{{ route('characters.index') }}" class="row g-2 align-items-end mb-4">
+                <div class="col-md-4">
+                    <label for="search" class="form-label">Search by name</label>
+                    <input
+                        type="text"
+                        name="search"
+                        id="search"
+                        class="form-control"
+                        value="{{ request('search') }}"
+                        placeholder="Search characters"
                     >
-                        All elements
-                    </a>
-
-                    @foreach ($elements as $elementOption)
-                        <a
-                            class="btn {{
-                                (string) $element === (string) $elementOption->id
-                                    ? 'btn-primary'
-                                    : 'btn-outline-primary'
-                            }} btn-sm"
-                            href="{{ route('characters.index', [
-                                'element' => $elementOption->id,
-                                'rarity' => $rarity !== 'all' ? $rarity : null
-                            ]) }}"
-                        >
-                            {{ $elementOption->name }}
-                        </a>
-                    @endforeach
                 </div>
-            </div>
 
-            <div class="mb-4">
-                <h5>Filter by rarity</h5>
-
-                <div class="d-flex flex-wrap gap-2">
-                    <a
-                        class="btn btn-outline-secondary btn-sm"
-                        href="{{ route('characters.index', [
-                            'element' => $element !== 'all' ? $element : null
-                        ]) }}"
-                    >
-                        All rarities
-                    </a>
-
-                    @foreach ([4, 5] as $rarityOption)
-                        <a
-                            class="btn {{
-                                (string) $rarity === (string) $rarityOption
-                                    ? 'btn-warning'
-                                    : 'btn-outline-warning'
-                            }} btn-sm"
-                            href="{{ route('characters.index', [
-                                'element' => $element !== 'all' ? $element : null,
-                                'rarity' => $rarityOption
-                            ]) }}"
-                        >
-                            {{ $rarityOption }}-Star
-                        </a>
-                    @endforeach
+                <div class="col-md-3">
+                    <label for="element_id" class="form-label">Element</label>
+                    <select name="element_id" id="element_id" class="form-select">
+                        <option value="">All elements</option>
+                        @foreach ($elements as $element)
+                            <option
+                                value="{{ $element->id }}"
+                                @selected(request('element_id') == $element->id)
+                            >
+                                {{ $element->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <a
-                    class="btn btn-success btn-sm"
-                    href="{{ route('characters.index') }}"
-                >
-                    Clear both filters
-                </a>
-            </div>
+                <div class="col-md-2">
+                    <label for="is_playable" class="form-label">Playable</label>
+                    <select name="is_playable" id="is_playable" class="form-select">
+                        <option value="">Any</option>
+                        <option value="1" @selected(request('is_playable') === '1')>Yes</option>
+                        <option value="0" @selected(request('is_playable') === '0')>No</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label for="sort" class="form-label">Sort by</label>
+                    <select name="sort" id="sort" class="form-select">
+                        <option value="name" @selected(request('sort', 'name') === 'name')>
+                            Name
+                        </option>
+                        <option value="rarity" @selected(request('sort') === 'rarity')>
+                            Rarity
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-1 d-grid">
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                </div>
+
+                <div class="col-12">
+                    <a href="{{ route('characters.index') }}">Clear all filters</a>
+                </div>
+            </form>
 
             <div class="table-responsive">
                 <table class="table table-striped table-bordered align-middle">
@@ -138,38 +98,22 @@
                     <tbody>
                         @forelse ($characters as $character)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
-
+                                <td>{{ $characters->firstItem() + $loop->index }}</td>
                                 <td>{{ $character->id }}</td>
-
                                 <td>
-                                    <a
-                                        href="{{ route('characters.show', $character) }}"
-                                    >
+                                    <a href="{{ route('characters.show', $character) }}">
                                         {{ $character->name }}
                                     </a>
                                 </td>
-
-                                <td>
-                                    {{ $character->element->name }}
-                                </td>
-
-                                <td>
-                                    {{ $character->weapon }}
-                                </td>
-
+                                <td>{{ $character->element->name }}</td>
+                                <td>{{ $character->weapon }}</td>
                                 <td>
                                     @if ($character->rarity >= 5)
-                                        <span class="badge text-bg-warning">
-                                            5-Star Featured
-                                        </span>
+                                        <span class="badge text-bg-warning">5-Star Featured</span>
                                     @else
-                                        <span class="badge text-bg-secondary">
-                                            {{ $character->rarity }}-Star
-                                        </span>
+                                        <span class="badge text-bg-secondary">{{ $character->rarity }}-Star</span>
                                     @endif
                                 </td>
-
                                 <td>
                                     <a
                                         class="btn btn-warning btn-sm"
@@ -177,38 +121,20 @@
                                     >
                                         Edit
                                     </a>
-
-                                    <form
-                                        action="{{ route('characters.destroy', $character) }}"
-                                        method="POST"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Delete this character?')"
-                                    >
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button
-                                            type="submit"
-                                            class="btn btn-danger btn-sm"
-                                        >
-                                            Delete
-                                        </button>
-                                    </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td
-                                    colspan="7"
-                                    class="text-center text-muted py-4"
-                                >
-                                    No characters match the selected filters.
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    No characters match the selected question.
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+
+            {{ $characters->links() }}
         </div>
     </div>
 @endsection

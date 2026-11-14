@@ -1,12 +1,11 @@
 <?php
 
 use App\Http\Controllers\GenshinImpactController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/whoami', function () {
-    return 'John Cedric P. Taopo | 2023-70351 | Block 4C | ITRACKB4 Laravel 12';
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/characters/filter/{element?}', function (?string $element = null) {
     if ($element === null || $element === '') {

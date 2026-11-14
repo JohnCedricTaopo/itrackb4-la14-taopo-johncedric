@@ -11,27 +11,43 @@ class GenshinImpactController extends Controller
 {
     public function index(Request $request)
     {
-        $element = $request->query('element', 'all');
-        $rarity = $request->query('rarity', 'all');
+        $search = $request->query('search');
+        $elementId = $request->query('element_id');
+        $playable = $request->query('is_playable');
+        $sort = $request->query('sort', 'name');
+
+        if (! in_array($sort, ['name', 'rarity'])) {
+            $sort = 'name';
+        }
 
         $query = Character::with('element');
 
-        if ($element !== 'all' && $element !== '') {
-            $query->where('element_id', $element);
+        if ($search) {
+            $query->where('name', 'like', "%{$search}%");
         }
 
-        if ($rarity !== 'all' && $rarity !== '') {
-            $query->where('rarity', $rarity);
+        if ($elementId !== null && $elementId !== '') {
+            $query->where('element_id', $elementId);
         }
 
-        $characters = $query->get();
+        if ($playable !== null && $playable !== '') {
+            $query->where('is_playable', $playable);
+        }
+
+        $characters = $query
+        ->orderBy($sort)
+        ->paginate(6)
+        ->withQueryString();
+        
         $elements = Element::all();
 
         return view('characters.index', [
             'characters' => $characters,
             'elements' => $elements,
-            'element' => $element,
-            'rarity' => $rarity,
+            'search' => $search,
+            'elementId' => $elementId,
+            'playable' => $playable,
+            'sort' => $sort,
         ]);
     }
 
