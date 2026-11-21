@@ -14,9 +14,14 @@
                     <p class="text-muted mb-0">Search, filter and sort the character records.</p>
                 </div>
 
-                <a class="btn btn-success" href="{{ route('characters.create') }}">
-                    Add character
-                </a>
+                @auth
+                    <a
+                        href="{{ route('characters.create') }}"
+                        class="btn btn-primary"
+                    >
+                        + Add character
+                    </a>
+                @endauth
             </div>
 
             @if (session('success'))
@@ -91,7 +96,9 @@
                             <th>Element</th>
                             <th>Weapon</th>
                             <th>Rarity</th>
-                            <th>Actions</th>
+                            @auth
+                                <th>Actions</th>
+                            @endauth
                         </tr>
                     </thead>
 
@@ -114,18 +121,34 @@
                                         <span class="badge text-bg-secondary">{{ $character->rarity }}-Star</span>
                                     @endif
                                 </td>
-                                <td>
-                                    <a
-                                        class="btn btn-warning btn-sm"
-                                        href="{{ route('characters.edit', $character) }}"
-                                    >
-                                        Edit
-                                    </a>
-                                </td>
+                                @auth
+                                    <td>
+                                        <a
+                                            class="btn btn-warning btn-sm"
+                                            href="{{ route('characters.edit', $character) }}"
+                                        >
+                                            Edit
+                                        </a>
+
+                                        <form
+                                            action="{{ route('characters.destroy', $character) }}"
+                                            method="POST"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Delete this character?')"
+                                        >
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                @endauth
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">
+                                <td colspan="{{ Auth::check() ? 7 : 6 }}" class="text-center text-muted py-4">
                                     No characters match the selected question.
                                 </td>
                             </tr>

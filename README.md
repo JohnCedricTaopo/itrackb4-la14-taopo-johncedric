@@ -1,13 +1,25 @@
-## Lab Activity 13 Answers
+## Lab Activity 14 Answers
 
-### J1. What does HomeController not have to do?
+### F1. Authentication and authorisation are not the same. What did this lesson give you, and what is still missing?
 
-My HomeController is not a resource controller, so its `index()` method does not have to receive a record ID or perform resource actions such as showing, creating, updating or deleting a Character. It only prepares the two live counts and returns the `home` view.
+This lesson gave my Genshin Impact archive authentication, so the application can identify a registered user through registration, login and logout. Authorisation is still missing because every signed-in account can currently perform the protected character actions; the next lesson will decide what each account is allowed to do.
 
-### J2. Why did the pagination links lose the search term?
+### F2. Why does a successful login call session()->regenerate()?
 
-Before I added `withQueryString()`, the pagination links only contained the page number. Because the search value was not carried into the next URL, the controller received an empty search value and returned the full list again. `withQueryString()` keeps the search, filter and sort values in every pagination link.
+The session ID is regenerated after a successful login to prevent session fixation. If it is skipped, someone who already knew the old session ID could possibly continue using that ID after the account became signed in.
 
-### J3. Why is a misspelled sort value worse than an error, and what does the allowed list do?
+### F3. Why is the failed-login message the same for a wrong password and an unknown email?
 
-A misspelled sort value is worse than an obvious error because the page still loads but the visitor cannot trust the order of the records. My allowed list accepts only `name` and `rarity`; anything else automatically falls back to `name` before the query runs.
+The same generic message prevents a stranger from discovering which email addresses are registered in my application. It gives the real user enough information to try again without revealing account information.
+
+### F4. Why are index and show public while the other five actions use auth?
+
+The character list and detail pages are meant for visitors to browse the Genshin Impact archive, so `index` and `show` remain public. Creating, editing, updating and deleting change the database, so those five actions require a signed-in user.
+
+### F5. Why is hiding Add and the actions not enough to secure them?
+
+A visitor can still type the create or edit URL directly even when the button is hidden. The `auth` middleware on the five changing resource actions is what actually stops a guest from reaching those actions.
+
+### F6. Why must the login route be named exactly login?
+
+Laravel’s `auth` middleware sends an unauthenticated visitor to the route named `login`. If I rename it to `signin`, the middleware cannot find the expected route and produces a route-not-defined error.
